@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>지그챗</title>
+
+    <!-- 패비콘 -->
+    <link rel="apple-touch-icon" sizes="57x57" href="assets/images/favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="assets/images/favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="assets/images/favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="assets/images/favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="assets/images/favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/images/favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="assets/images/favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="assets/images/favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/images/favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicons/favicon-16x16.png">
+    <link rel="manifest" href="assets/images/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="assets/images/favicons/ms-icon-144x144.png">
+
+    <!-- Theme Colour -->
+    <meta name="theme-color" content="#8a0e2a">
+
+    <!-- markdown-it -->
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-sup/dist/markdown-it-sup.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-sub/dist/markdown-it-sub.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-footnote/dist/markdown-it-footnote.min.js"></script>
+
+    <!-- Prism.js (코드 하이라이팅 - Okaidia 테마) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/themes/prism-okaidia.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-core.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"
+        data-autoloader-path="https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/"></script>
+
+    <!-- Font Awesome -->
+    <link href="/assets/fonts/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="/assets/fonts/fontawesome/css/solid.min.css" rel="stylesheet" />
+    <link href="/assets/fonts/fontawesome/css/regular.min.css" rel="stylesheet" />
+    <link href="/assets/fonts/fontawesome/css/light.min.css" rel="stylesheet" />
+    <link href="/assets/fonts/fontawesome/css/thin.min.css" rel="stylesheet" />
+    <link href="/assets/fonts/fontawesome/css/brands.min.css" rel="stylesheet" />
+
+    <!-- Twemoji -->
+    <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@latest/dist/twemoji.min.js" crossorigin="anonymous"></script>
+
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.css"
+        integrity="sha384-Wsr4Nh3yrvMf2KCebJchRJoVo1gTU6kcP05uRSh5NV3sj9+a8IomuJoQzf3sMq4T" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/katex.min.js"
+        integrity="sha384-+W9OcrYK2/bD7BmUAk+xeFAyKp0QjyRQUCxeU31dfyTt/FrPsUgaBTLLkVf33qWt" crossorigin="anonymous">
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.28/dist/contrib/auto-render.min.js"
+        integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous">
+    </script>
+
+    <!-- UI -->
+    <link rel="stylesheet" href="assets/app-ui/app-ui.css">
+    <script defer src="assets/app-ui/app-ui.js"></script>
+
+    <!-- 확장: Unicodeify -->
+    <script defer src="assets/extensions/unicodeify.js"></script>
+</head>
+
+<body class="h-screen w-screen flex flex-col relative">
+    <div id="lobby-layout" class="h-full w-full flex flex-col items-center justify-center relative overflow-hidden hide"
+        aria-hidden="true">
+        <div class="lobby-backdrop" aria-hidden="true"></div>
+        <div class="lobby-panel z-10">
+            <div class="lobby-brand">
+                <img class="lobby-logo" src="assets/images/drawingchat_logo.png" alt="지그챗 로고" title="지그챗 로고">
+                <h1 class="lobby-title text-5xl md:text-6xl font-bold tracking-tight text-white">지그챗</h1>
+            </div>
+            <p class="text-sm text-gray-400 mt-2">샘플 로그인 단계입니다. 닉네임만 입력하시면 됩니다.</p>
+
+            <form id="login-form" class="lobby-form" novalidate>
+                <label for="lobby-nickname" class="text-sm text-gray-300">닉네임</label>
+                <div class="lobby-input-row">
+                    <i class="fa-solid fa-user text-gray-400" aria-hidden="true"></i>
+                    <input id="lobby-nickname" name="nickname" type="text" maxlength="24" class="lobby-input"
+                        placeholder="예: CarMilZ" autocomplete="nickname" required>
+                </div>
+                <p id="login-error" class="lobby-error hide" role="alert"></p>
+                <button type="submit" class="lobby-submit">입장하기</button>
+            </form>
+        </div>
+
+        <p class="text-gray-300 text-sm absolute bottom-10 z-10" data-app-version-line></p>
+    </div>
+
+    <!-- 메인 레이아웃 -->
+    <div id="main-layout" class="flex-1 flex w-full h-full overflow-hidden">
+        <!-- 사이드바 -->
+        <nav class="
+            w-full h-16 fixed bottom-0 left-0 bg-[#161616] z-40 flex justify-around items-center
+            md:relative md:w-24 md:h-full md:flex-col md:justify-start md:space-y-8 md:pt-8
+        ">
+            <!-- 채팅 탭 -->
+            <button type="button" data-action="navigate" data-tab="chat" id="nav-chat"
+                class="p-3 rounded-lg hover:bg-[#2a2a2a] transition-colors flex flex-col gap-1.5 items-center justify-center w-full md:w-auto active-nav">
+                <i class="fa-solid fa-comment-lines"></i>
+                <span class="text-xs">채팅</span>
+            </button>
+
+            <!-- 게시판 탭 -->
+            <button type="button" data-action="navigate" data-tab="board" id="nav-board"
+                class="p-3 rounded-lg hover:bg-[#2a2a2a] transition-colors flex flex-col gap-1.5 items-center justify-center w-full md:w-auto">
+                <i class="fa-solid fa-list"></i>
+                <span class="text-xs">게시판</span>
+            </button>
+
+            <!-- 지도 탭 -->
+            <button type="button" data-action="navigate" data-tab="map" id="nav-map"
+                class="p-3 rounded-lg hover:bg-[#2a2a2a] transition-colors flex flex-col gap-1.5 items-center justify-center w-full md:w-auto">
+                <i class="fa-solid fa-map"></i>
+                <span class="text-xs">지도</span>
+            </button>
+
+            <!-- 앱 정보 탭 -->
+            <button type="button" data-action="navigate" data-tab="info" id="nav-info"
+                class="p-3 rounded-lg hover:bg-[#2a2a2a] transition-colors flex flex-col gap-1.5 items-center justify-center w-full md:w-auto md:mt-auto">
+                <i class="fa-solid fa-circle-info"></i>
+                <span class="text-xs">앱 정보</span>
+            </button>
+
+        </nav>
+
+        <!-- 콘텐츠 영역 -->
+        <main class="flex-1 bg-[#1e1e1e] relative w-full h-[calc(100%-4rem)] md:h-full overflow-hidden">
+            <!-- 채팅 화면 -->
+            <div id="view-chat" class="w-full h-full flex flex-col">
+                <header class="chat-mobile-header md:hidden h-14 bg-[#161616] flex items-center px-4 shrink-0">
+                    <h2 class="font-bold text-lg">일반 채팅</h2>
+                </header>
+                <header class="chat-desktop-header" aria-label="채팅 헤더">
+                    <h2 class="font-bold text-xl">일반 채팅</h2>
+                </header>
+
+                <div class="flex-1 min-h-0 relative">
+                    <div id="chat-scroll-area" class="h-full overflow-y-auto p-4">
+                        <div class="space-y-6 flex flex-col justify-end min-h-full" id="chat-container"
+                            aria-live="polite"></div>
+                    </div>
+                    <button id="chat-jump-latest-btn" type="button" class="chat-jump-latest-btn hide"
+                        aria-label="최신 채팅으로 이동" title="최신 채팅으로 이동">
+                        <i class="fa-solid fa-angles-down" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="p-4 bg-[#1e1e1e] shrink-0">
+                    <form id="chat-form" class="bg-[#2b2b2b] rounded-lg flex items-center px-4 py-2">
+                        <button type="button" class="text-gray-400 hover:text-white mr-2">
+                            <i class="fa-solid fa-circle-plus text-xl"></i>
+                        </button>
+                        <textarea id="chat-input" maxlength="1000" rows="1" placeholder="채팅 입력"
+                            class="chat-compose-input bg-transparent border-none outline-none text-white w-full h-10"></textarea>
+                        <button type="submit" class="text-gray-400 hover:text-white ml-2" aria-label="메시지 전송">
+                            <i class="fa-solid fa-paper-plane text-xl"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 게시판 목록 화면 -->
+            <div id="view-board" class="w-full h-full flex flex-col relative hide">
+                <header class="h-16 flex items-center px-6 shrink-0">
+                    <h2 class="text-xl font-bold">자유 게시판</h2>
+                </header>
+
+                <form id="board-create-form" class="post-edit-panel hide board-create-panel" novalidate>
+                    <label for="board-create-title" class="text-sm text-gray-300">제목</label>
+                    <input id="board-create-title" type="text" maxlength="120" class="post-edit-input"
+                        placeholder="게시글 제목">
+                    <label for="board-create-content" class="text-sm text-gray-300">본문 (Markdown 가능)</label>
+                    <textarea id="board-create-content" class="post-edit-textarea" maxlength="10000"
+                        placeholder="게시글 본문"></textarea>
+                    <div class="post-edit-actions">
+                        <button type="button" id="board-create-cancel-btn" class="post-edit-cancel">취소</button>
+                        <button type="submit" class="post-edit-save">등록</button>
+                    </div>
+                </form>
+
+                <div id="board-list" class="flex-1 overflow-y-auto"></div>
+                <button type="button" data-action="create-post" class="board-create-fab" aria-label="글 작성"
+                    title="글 작성">
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <!-- 게시판 상세 화면 -->
+            <div id="view-post-detail" class="w-full h-full flex flex-col hide bg-[#1e1e1e]">
+                <!-- 상단 헤더 (뒤로가기) -->
+                <div class="h-14 flex items-center px-4 shrink-0">
+                    <button type="button" data-action="navigate" data-tab="board"
+                        class="text-gray-400 hover:text-white flex items-center gap-1 pr-4">
+                        <i class="fa-solid fa-arrow-left text-base"></i>
+                        <span>목록</span>
+                    </button>
+                </div>
+
+                <!-- 상세 내용 스크롤 영역 -->
+                <div class="flex-1 overflow-y-auto p-6 md:p-10 w-full">
+                    <h1 id="post-detail-title" class="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">게시글
+                        제목</h1>
+
+                    <div class="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-8 pb-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center">
+                                <i class="fa-solid fa-user text-gray-400 text-xs"></i>
+                            </div>
+                            <span id="post-detail-author" class="text-gray-300 font-medium">작성자</span>
+                        </div>
+
+                        <span class="text-gray-700 hidden md:inline">|</span>
+                        <span id="post-detail-date" class="text-xs md:text-sm">2026. 02. 19. 00:00:00</span>
+
+                        <div class="ml-auto flex items-center gap-1.5">
+                            <button id="post-detail-copy-btn" type="button" data-action="copy-post-original"
+                                class="content-action-btn" aria-label="게시글 원본 복사" title="원본 복사">
+                                <i class="fa-solid fa-copy" aria-hidden="true"></i>
+                            </button>
+                            <button id="post-detail-edit-btn" type="button" data-action="edit-post"
+                                class="content-action-btn" aria-label="게시글 수정" title="수정">
+                                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                            </button>
+                            <button id="post-detail-delete-btn" type="button" data-action="delete-post"
+                                class="content-action-btn is-danger" aria-label="게시글 삭제" title="삭제">
+                                <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <form id="post-edit-form" class="post-edit-panel hide" novalidate>
+                        <label for="post-edit-title" class="text-sm text-gray-300">제목</label>
+                        <input id="post-edit-title" type="text" maxlength="120" class="post-edit-input"
+                            placeholder="게시글 제목">
+                        <label for="post-edit-content" class="text-sm text-gray-300">본문 (Markdown 가능)</label>
+                        <textarea id="post-edit-content" class="post-edit-textarea" maxlength="10000"
+                            placeholder="게시글 본문"></textarea>
+                        <div class="post-edit-actions">
+                            <button type="button" id="post-edit-cancel-btn" class="post-edit-cancel">취소</button>
+                            <button type="submit" class="post-edit-save">저장</button>
+                        </div>
+                    </form>
+
+                    <div id="post-detail-readonly">
+                        <div id="post-detail-content" data-render="md" data-md-footnote="enabled"
+                            class="text-gray-300 leading-relaxed min-h-[200px] whitespace-pre-line"></div>
+
+                        <div class="mt-12 pt-6">
+                            <h3 class="font-bold text-gray-200 mb-6 text-sm">댓글 <span id="post-comments-count"
+                                    class="text-[#ff4040]">0</span></h3>
+
+                            <div id="post-comments-list"></div>
+
+                            <form id="post-comment-form" class="pt-4">
+                                <div class="flex gap-2">
+                                    <textarea id="post-comment-input" rows="1" maxlength="1000"
+                                        placeholder="댓글을 입력하세요..."
+                                        class="flex-1 bg-[#252525] rounded p-3 text-sm text-white outline-none border border-transparent focus:border-gray-700 transition-colors"></textarea>
+                                    <button type="submit"
+                                        class="px-4 py-2 bg-[#ff4040] hover:bg-[#cc3333] rounded text-sm text-white font-bold transition-colors whitespace-nowrap">등록</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 지도 화면 -->
+            <div id="view-map" class="w-full h-full hide map-view">
+                <section id="map-stage" class="map-stage" tabindex="0" aria-label="지도 화면 (스크롤 또는 방향키로 지도 전환)">
+                    <figure class="map-slide is-active" data-map-slide data-map-title="지그방 세계지도 (국명 없는 버전)">
+                        <img src="/assets/images/maps/지그방 세계지도(국명 없는 버전).png" alt="지그방 세계지도 (국명 없는 버전)">
+                    </figure>
+                    <figure class="map-slide" data-map-slide data-map-title="지그방 세계지도 (국명 있는 버전)">
+                        <img src="/assets/images/maps/지그방 세계지도(국명 있는 버전).png" alt="지그방 세계지도 (국명 있는 버전)" loading="lazy"
+                            decoding="async">
+                    </figure>
+                    <figure class="map-slide" data-map-slide data-map-title="지그방 세계지도 (위도 버전)">
+                        <img src="/assets/images/maps/지그방 세계지도(위도 버전).png" alt="지그방 세계지도 (위도 버전)" loading="lazy"
+                            decoding="async">
+                    </figure>
+
+                    <div class="map-stage-topbar">
+                        <p id="map-current-title" class="map-stage-title">지그방 세계지도 (국명 없는 버전)</p>
+                    </div>
+
+                    <div class="map-stage-bottombar">
+                        <p class="map-stage-hint">스크롤하여 다른 지도 보기</p>
+                        <p class="map-stage-counter">
+                            <span id="map-current-index">1</span>
+                            <span aria-hidden="true"> / </span>
+                            <span id="map-total-count">3</span>
+                        </p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- 앱 정보 화면 -->
+            <div id="view-info" class="w-full h-full flex flex-col hide">
+                <div id="app-info-scroll-track" class="app-info-scroll-track flex-1" aria-label="앱 정보 및 도움말">
+                    <section id="app-info-page-about" class="app-info-page app-info-page-about" aria-label="지그챗 앱 정보">
+                        <div class="app-info-body">
+                            <section class="app-info-panel" aria-label="지그챗 앱 정보 상세">
+                                <img class="app-info-logo" src="/assets/images/drawingchat_app_icon.png" alt="지그챗 앱 아이콘"
+                                    title="지그챗 앱 아이콘">
+                                <h3 class="app-info-title">DrawingChat</h3>
+                                <p class="app-info-description">A DrawingMap Project<br>Starts in February 2026</p>
+
+                                <p class="app-info-version" data-app-version-badge></p>
+                                <a class="app-info-link-btn" href="https://open.kakao.com/o/gNX8LMyc" target="_blank"
+                                    rel="noopener noreferrer">
+                                    <i class="fa-solid fa-comment-dot" aria-hidden="true"></i>
+                                    <span>카톡 오픈채팅</span>
+                                </a>
+                                <button type="button" data-action="open-license-modal" class="app-info-modal-btn">
+                                    <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+                                    <span>라이선스</span>
+                                </button>
+                                <button type="button" data-action="open-changelog-modal" class="app-info-modal-btn">
+                                    <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                                    <span>체인지로그</span>
+                                </button>
+                                <small class="app-info-since"><i>DrawingMap Since 2020. 8. 31.</i></small>
+                            </section>
+                        </div>
+                        <p class="app-info-scroll-hint" aria-hidden="true">
+                            <i class="fa-solid fa-angles-down" aria-hidden="true"></i>
+                            <span>아래로 스크롤하여 도움말 보기</span>
+                        </p>
+                    </section>
+
+                    <section id="app-info-page-help" class="app-info-page app-info-page-help" aria-label="지그챗 도움말">
+                        <div class="app-info-help-body">
+                            <header class="app-info-help-header">
+                                <div>
+                                    <p class="app-info-help-eyebrow">Help</p>
+                                    <h2 class="app-info-help-title">도움말</h2>
+                                </div>
+                                <p class="app-info-scroll-hint app-info-scroll-hint-up" aria-hidden="true">
+                                    <i class="fa-solid fa-angles-up" aria-hidden="true"></i>
+                                    <span>위로 스크롤하여 앱 정보 보기</span>
+                                </p>
+                            </header>
+
+                            <section class="mb-8">
+                                <h3 class="text-2xl md:text-3xl font-bold text-white mb-3">지그챗 도움말에 오신 것을 환영합니다!</h3>
+                                <p class="text-gray-300 leading-relaxed">
+                                    글꼴 관련, 마크다운 등의 문법 관련 매뉴얼을 모았습니다. <del>비록 부실하지만 양해 부탁드려요</del>
+                                </p>
+                            </section>
+
+                            <section class="mb-7" data-faq-category="chat">
+                                <h4 class="text-lg font-bold text-white mb-3">글꼴 관련</h4>
+                                <div class="space-y-3">
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 무슨 글꼴을 사용하고 있나요?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. <b>Montserrat</b>(로마자 등),
+                                            <b>본고딕</b>(CJK용)을 기본으로 하고 있습니다.
+                                            <br><br>
+                                            이 외에는 확장신자체를 나타내기 위한 <b>Kosugi</b>, 확장 한자를 나타내기 위한 <b>Jigmo</b>, IPA를 나타내기
+                                            위한 <b>Gentium Plus</b>, 본 앱의 기본 고정폭 글꼴인 <b>D2Coding</b>이 있습니다.
+                                            <br><br>
+                                            Jigmo랑 D2Coding은 별도 설치입니다. 아래 "Q. 따로 설치해야 하는 글꼴은요?"를 참고하세요.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 따로 설치해야 하는 글꼴은요?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. Jigmo는 유니코드 17.0까지의 모든 한자를 지원하는 만큼 용량이
+                                            방대하고 D2Coding은 공식 웹 폰트를 제공하지 않아 직접 설치하셔야 합니다. 아래 링크에서 설치해주시기 바랍니다. <del>모바일은
+                                                방법이 없읍니다 죄송합니엌</del>
+                                            <br><br>
+                                            <b><a href="https://kamichikoichi.github.io/jigmo/" target="_blank"
+                                                    rel="noopener noreferrer">Jigmo 공식 사이트(클릭 시 새 창에서
+                                                    열림)</a></b><br><b><a href="https://github.com/naver/d2codingfont"
+                                                    target="_blank" rel="noopener noreferrer">D2Coding 공식 레포지토리(클릭 시 새
+                                                    창에서 열림)</a></b></p>
+                                    </details>
+                                </div>
+                            </section>
+
+                            <section class="mb-7" data-faq-category="board">
+                                <h4 class="text-lg font-bold text-white mb-3">문법 관련</h4>
+                                <div class="space-y-3">
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 여기에서 사용하는 문법이 뭐예요?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 지그챗에서는 기본적으로 마크다운(markdown-it)과 수식 렌더링을
+                                            위해 KaTeX를 사용합니다. 일부 HTML 코드도 사용하실 수 있습니다.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 마크다운?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. <b><a
+                                                    href="https://markdown-it.github.io/" target="_blank"
+                                                    rel="noopener noreferrer">여기(클릭)</a></b>를 참고하시면 됩니다.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. KaTeX?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 수식을 렌더링하는 라이브러리입니다. LaTeX의 문법을 대부분 사용하실
+                                            수 있습니다. 수식을 감싸실 때에는 <code>\\( ... \\)</code>(인라인), <code>\\[ ...
+                                                \\]</code>(디스플레이)를 사용하세요.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. HTML은 뭘 쓸 수 있어요?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. <code>&lt;span&gt;</code>을 사용하실 수 있습니다.
+                                            아래 예제를 참고하세요.
+                                            <br><br>
+                                            <code>&lt;span lang="{언어 코드}"&gt; ... &lt;/span&gt;</code>: 한자 글꼴 지정
+                                            <br><br>
+                                            <code>&lt;span style="font-size: {숫자}px"&gt; ... &lt;/span&gt;</code>: 글자 크기
+                                            <br><br>
+                                            <code>&lt;span class="exs"&gt; ... &lt;/span&gt;</code>: 확장신자체 사용(Kosugi 글꼴)
+                                            <br><br>
+                                            <code>&lt;span class="ipa"&gt; ... &lt;/span&gt;</code>: IPA 사용(Gentium Plus 글꼴)</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 지그방 자체 추가 문법: 유니코드 입력기(Unicode IME)
+                                        </summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. <del>IME라고 하기에는 좀 그렇지만</del>
+                                            <code>\u{유니코드 번호}</code>를 사용하여 유니코드 번호를 통해 문자를 직접 입력하실 수 있습니다.
+                                            <br><br>
+                                            e.g., <code>\u9999</code> → 香</p>
+                                    </details>
+                                </div>
+                            </section>
+
+                            <section class="mb-7" data-faq-category="board">
+                                <h4 class="text-lg font-bold text-white mb-3">설정 관련</h4>
+                                <div class="space-y-3">
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 메시지 전송 키?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 메시지 전송 키 조합을 바꾸는 설정입니다. 기본은
+                                            <code>Enter</code>(줄바꿈: <code>Shift</code>+<code>Enter</code>)입니다.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 새 메시지 자동 이동?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 채팅에 새로운 메시지가 올라오면 자동으로 스크롤을 이동합니다. 기본은
+                                            '끝에 있을 때만'입니다.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 채팅 댓글 즉시 삭제?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 삭제 버튼을 누를 시 물어보지 않고 즉시 삭제하는 설정입니다.</p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. 유니코드 비주얼라이저(Unicode Visualiser)?
+                                        </summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 글자를 드래그하면 드래그한 문자의 유니코드 번호를 보여주는 기능입니다.
+                                        </p>
+                                    </details>
+                                    <details class="p-4 rounded-lg bg-[#242424]">
+                                        <summary class="text-gray-200 font-bold">Q. Twemoji 미사용?</summary>
+                                        <p class="text-sm text-gray-400 mt-3">A. 지그챗은 이모지 렌더러로서 트위모지(Twemoji)를
+                                            이용합니다(TMI로 디스코드가 이걸 사용함). 이 옵션을 설정하면 이모지를 기본 유니코드상의 이모지 문자로 보여줍니다. 대신 이 옵션을
+                                            켜시면 이모지를 단독으로 사용 시 크게 보이는 기능은 없어집니다.</p>
+                                    </details>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="license-modal" class="app-info-modal hide" role="dialog" aria-modal="true"
+                    aria-labelledby="license-modal-title" aria-describedby="license-modal-description"
+                    aria-hidden="true">
+                    <div class="app-info-modal-backdrop" data-action="close-license-modal" aria-hidden="true"></div>
+                    <section class="app-info-modal-panel" aria-label="라이선스 창">
+                        <h4 id="license-modal-title" class="app-info-modal-title">Licences</h4>
+                        <div id="license-modal-description" class="app-info-modal-content">
+                            <section class="app-info-license-section">
+                                <p>본 앱은 아래 라이브러리 및 글꼴을 사용하고 있습니다. 이에 각 라이브러리 및 글꼴별 라이선스를 고지드립니다.</p>
+                            </section>
+                            <hr class="app-info-license-divider">
+                            <section class="app-info-license-section">
+                                <h5 class="app-info-license-heading">사용된 라이브러리</h5>
+                                <ul class="app-info-license-list">
+                                    <li><a href="https://markdown-it.github.io/">markdown-it</a> | <a
+                                            href="https://github.com/markdown-it/markdown-it#MIT-1-ov-file">MIT
+                                            Licence</a></li>
+                                    <li><a href="https://prismjs.com/">Prijm.js</a> | <a
+                                            href="https://github.com/PrismJS/prism/#MIT-1-ov-file">MIT Licence</a></li>
+                                    <li><a href="https://github.com/twitter/twemoji">Twemoji</a> | <a
+                                            href="https://github.com/twitter/twemoji/blob/master/LICENSE">MIT
+                                            Licence</a></li>
+                                    <li><a href="https://katex.org/">KaTeX</a> | <a
+                                            href="https://github.com/KaTeX/KaTeX#MIT-1-ov-file">MIT Licence</a></li>
+                                </ul>
+                            </section>
+                            <section class="app-info-license-section">
+                                <h5 class="app-info-license-heading">사용된 글꼴</h5>
+                                <ul class="app-info-license-list">
+                                    <li>Font Awesome 7 | <i>별도의 프로 라이선스 사용 중</i></li>
+                                    <li>Twemoji | <a
+                                            href="https://github.com/twitter/twemoji/blob/master/LICENSE-GRAPHICS">CC BY
+                                            4.0</a></li>
+                                    <li>Montserrat | <a href="https://openfontlicense.org/">SIL Open Font Licence</a>
+                                    </li>
+                                    <li>본고딕 | <a href="https://openfontlicense.org/">SIL Open Font Licence</a></li>
+                                    <li>Jigmo | <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.ko">CC0
+                                            1.0</a></li>
+                                    <li>Gemtium Plus | <a href="https://openfontlicense.org/">SIL Open Font Licence</a>
+                                    </li>
+                                    <li>Kosugi | <a href="http://www.apache.org/licenses/">Apache</a></li>
+                                    <li><a href="https://github.com/naver/d2codingfont">D2Coding</a> | <a
+                                            href="https://openfontlicense.org/">SIL Open Font Licence</a></li>
+                                </ul>
+                            </section>
+                        </div>
+                        <div class="app-info-modal-actions">
+                            <button type="button" id="license-modal-close-btn" data-action="close-license-modal"
+                                class="app-info-modal-close-btn">
+                                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                <span>닫기</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="changelog-modal" class="app-info-modal hide" role="dialog" aria-modal="true"
+                    aria-labelledby="changelog-modal-title" aria-describedby="changelog-modal-description"
+                    aria-hidden="true">
+                    <div class="app-info-modal-backdrop" data-action="close-changelog-modal" aria-hidden="true"></div>
+                    <section class="app-info-modal-panel" aria-label="체인지로그 창">
+                        <h4 id="changelog-modal-title" class="app-info-modal-title">Changelog</h4>
+                        <div id="changelog-modal-description" class="app-info-modal-content">
+                            <section class="app-info-license-section">
+                                <p>버전별 변경 사항을 알려드립니다.</p>
+                            </section>
+                            <hr class="app-info-license-divider">
+                            <section class="app-info-license-section">
+                                <h5 class="app-info-license-heading">2026.0</h5>
+                                <span>프론트엔드 테스트용 샘플 버전</span>
+                                <ul class="app-info-license-list">
+                                    <li>2026.0.1(2026-02-21): 최초 샘플</li>
+                                    <li>2026.0.100(2026-02-23): 샘플 완성</li>
+                                </ul>
+                            </section>
+                            <section class="app-info-license-section">
+                                <h5 class="app-info-license-heading">2026.1</h5>
+                                <span>최초 정식 버전(예정)</span>
+                                <ul class="app-info-license-list">
+                                    <li>2026.1.?(2026-06 내 예정): 최초 정식 버전</li>
+                                </ul>
+                            </section>
+                        </div>
+                        <div class="app-info-modal-actions">
+                            <button type="button" id="changelog-modal-close-btn" data-action="close-changelog-modal"
+                                class="app-info-modal-close-btn">
+                                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                <span>닫기</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+        </main>
+
+        <div id="app-settings" class="app-settings">
+            <div class="app-settings-floating-row">
+                <div class="app-session-chip" aria-label="현재 접속자">
+                    <span class="app-session-chip-avatar" aria-hidden="true">
+                        <span data-user-initial>ME</span>
+                    </span>
+                    <span class="app-session-chip-status-dot" aria-hidden="true"></span>
+                    <span class="app-session-chip-label">접속</span>
+                    <strong data-user-name class="app-session-chip-name">나</strong>
+                </div>
+
+                <button type="button" id="app-settings-launcher" data-action="toggle-settings-panel"
+                    class="app-settings-launcher" aria-label="설정 열기" aria-controls="app-settings-panel"
+                    aria-expanded="false">
+                    <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <section id="app-settings-panel" class="app-settings-panel" aria-hidden="true">
+                <div class="app-settings-header">
+                    <h3 class="app-settings-title">설정</h3>
+                    <button type="button" data-action="close-settings-panel" class="app-settings-close"
+                        aria-label="설정 닫기">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div id="send-keymap-setting-item" class="app-settings-item">
+                    <div class="app-settings-item-head">
+                        <label for="send-keymap-select" class="app-settings-item-label">메시지 전송 키</label>
+                    </div>
+                    <select id="send-keymap-select" class="app-settings-select" aria-label="메시지 전송 키 선택">
+                        <option value="enter">Enter</option>
+                        <option value="ctrl-enter">Ctrl + Enter</option>
+                        <option value="meta-enter">Cmd + Enter</option>
+                    </select>
+                </div>
+
+                <div id="chat-auto-scroll-setting-item" class="app-settings-item">
+                    <div class="app-settings-item-head">
+                        <label for="chat-auto-scroll-select" class="app-settings-item-label">새 메시지 자동 이동</label>
+                    </div>
+                    <select id="chat-auto-scroll-select" class="app-settings-select" aria-label="새 메시지 자동 이동 방식 선택">
+                        <option value="near-bottom">끝에 있을 때만</option>
+                        <option value="always">항상 이동</option>
+                        <option value="off">자동 이동 안 함</option>
+                    </select>
+                </div>
+
+                <div id="instant-delete-setting-item" class="app-settings-item">
+                    <div class="app-settings-item-head">
+                        <span class="app-settings-item-label">
+                            채팅/댓글 즉시 삭제
+                        </span>
+                    </div>
+                    <button type="button" id="instant-delete-toggle" data-action="toggle-instant-delete-mode"
+                        class="app-settings-toggle" role="switch" aria-checked="false" aria-label="채팅 및 댓글 즉시 삭제 옵션">
+                        <span class="app-settings-toggle-track" aria-hidden="true">
+                            <span class="app-settings-toggle-thumb"></span>
+                        </span>
+                    </button>
+                </div>
+
+                <div id="unicode-visualiser-setting-item" class="app-settings-item">
+                    <div class="app-settings-item-head">
+                        <span class="app-settings-item-label">
+                            유니코드 비주얼라이저
+                        </span>
+                    </div>
+                    <button type="button" id="unicode-visualiser-toggle" data-action="toggle-unicode-visualiser-mode"
+                        class="app-settings-toggle" role="switch" aria-checked="false" aria-label="유니코드 비주얼라이저 옵션">
+                        <span class="app-settings-toggle-track" aria-hidden="true">
+                            <span class="app-settings-toggle-thumb"></span>
+                        </span>
+                    </button>
+                </div>
+
+                <div id="twemoji-disabled-setting-item" class="app-settings-item">
+                    <div class="app-settings-item-head">
+                        <span class="app-settings-item-label">
+                            Twemoji 미사용
+                        </span>
+                    </div>
+                    <button type="button" id="twemoji-disabled-toggle" data-action="toggle-twemoji-disabled-mode"
+                        class="app-settings-toggle" role="switch" aria-checked="false" aria-label="Twemoji 미사용 옵션">
+                        <span class="app-settings-toggle-track" aria-hidden="true">
+                            <span class="app-settings-toggle-thumb"></span>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="app-settings-footer">
+                    <button type="button" data-action="logout" class="app-settings-logout-btn">
+                        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div id="logout-confirm-modal" class="app-info-modal logout-confirm-modal hide" role="dialog" aria-modal="true"
+            aria-labelledby="logout-confirm-modal-title" aria-describedby="logout-confirm-modal-description"
+            aria-hidden="true">
+            <div class="app-info-modal-backdrop" data-action="close-logout-confirm-modal" aria-hidden="true"></div>
+            <section class="app-info-modal-panel logout-confirm-modal-panel" aria-label="로그아웃 확인 창">
+                <h4 id="logout-confirm-modal-title" class="app-info-modal-title">로그아웃</h4>
+                <p id="logout-confirm-modal-description" class="logout-confirm-modal-description">정말 로그아웃하시겠습니까?</p>
+                <div class="app-info-modal-actions logout-confirm-modal-actions">
+                    <button type="button" id="logout-confirm-cancel-btn" data-action="close-logout-confirm-modal"
+                        class="app-info-modal-close-btn">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                        <span>취소</span>
+                    </button>
+                    <button type="button" id="logout-confirm-submit-btn" data-action="confirm-logout"
+                        class="logout-confirm-submit-btn">
+                        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                        <span>로그아웃</span>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <div id="app-toast" class="app-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+</body>
+
+</html>
