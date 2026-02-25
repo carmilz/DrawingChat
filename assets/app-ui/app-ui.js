@@ -198,7 +198,7 @@
     const INFO_SECTION_TOUCH_AXIS_RATIO = 1.2;
     const MAX_ENTITY_ID_LENGTH = 128;
     const CONTROL_CHARACTER_REGEX = /[\u0000-\u001F\u007F]/;
-    const APP_ENTRY_PATH = 'app.html';
+    const APP_ENTRY_PATH = 'index.html';
     // 앱 버전
     const APP_METADATA = Object.freeze({
         name: 'DrawingChat',
