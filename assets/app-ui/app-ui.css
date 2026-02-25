@@ -1947,7 +1947,9 @@ a {
     }
 
     .app-info-page-about>.app-info-scroll-hint {
+        left: max(0.7rem, calc(0.7rem + env(safe-area-inset-left, 0px)));
         bottom: max(0.7rem, calc(0.7rem + env(safe-area-inset-bottom, 0px)));
+        transform: none;
         padding: 0.3rem 0.6rem;
     }
 

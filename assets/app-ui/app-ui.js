@@ -203,7 +203,7 @@
     const APP_METADATA = Object.freeze({
         name: 'DrawingChat',
         version: '2026.0.100',
-        releaseDateLabel: '23 February 2026'
+        releaseDateLabel: '23 Feb 2026'
     });
     const APP_VERSION_LINE_SELECTOR = '[data-app-version-line]';
     const APP_VERSION_BADGE_SELECTOR = '[data-app-version-badge]';
@@ -2285,20 +2285,72 @@
         return String(value).padStart(2, '0');
     }
 
-    function formatDateTimeForUi(isoDateTime) {
+    const KOREAN_WEEKDAY_SHORT_LABELS = Object.freeze(['일', '월', '화', '수', '목', '금', '토']);
+
+    function parseIsoDateTime(isoDateTime) {
         const parsedDate = new Date(isoDateTime);
         if (Number.isNaN(parsedDate.getTime())) {
-            return '----. --. --. --:--:--';
+            return null;
+        }
+
+        return parsedDate;
+    }
+
+    function getLocalDateKey(parsedDate) {
+        if (!(parsedDate instanceof Date) || Number.isNaN(parsedDate.getTime())) {
+            return '';
         }
 
         const year = parsedDate.getFullYear();
         const month = padToTwoDigits(parsedDate.getMonth() + 1);
         const day = padToTwoDigits(parsedDate.getDate());
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatChatDateDividerLabel(isoDateTime) {
+        const parsedDate = parseIsoDateTime(isoDateTime);
+        if (!parsedDate) {
+            return '----. -. -. (?)';
+        }
+
+        const year = parsedDate.getFullYear();
+        const month = parsedDate.getMonth() + 1;
+        const day = parsedDate.getDate();
+        const weekday = KOREAN_WEEKDAY_SHORT_LABELS[parsedDate.getDay()] ?? '?';
+
+        return `${year}. ${month}. ${day}. (${weekday})`;
+    }
+
+    function formatChatTimeForUi(isoDateTime) {
+        const parsedDate = parseIsoDateTime(isoDateTime);
+        if (!parsedDate) {
+            return '--:--';
+        }
+
         const hour = padToTwoDigits(parsedDate.getHours());
         const minute = padToTwoDigits(parsedDate.getMinutes());
-        const second = padToTwoDigits(parsedDate.getSeconds());
+        return `${hour}:${minute}`;
+    }
 
-        return `${year}. ${month}. ${day}. ${hour}:${minute}:${second}`;
+    function formatBoardDateTimeForUi(isoDateTime) {
+        const parsedDate = parseIsoDateTime(isoDateTime);
+        if (!parsedDate) {
+            return '--. --. --. --:--';
+        }
+
+        const currentYear = new Date().getFullYear();
+        const year = parsedDate.getFullYear();
+        const yearShort = padToTwoDigits(year % 100);
+        const month = parsedDate.getMonth() + 1;
+        const day = parsedDate.getDate();
+        const hour = padToTwoDigits(parsedDate.getHours());
+        const minute = padToTwoDigits(parsedDate.getMinutes());
+
+        if (year === currentYear) {
+            return `${month}. ${day}. ${hour}:${minute}`;
+        }
+
+        return `${yearShort}. ${month}. ${day}. ${hour}:${minute}`;
     }
 
     function clearToastVariantClasses() {
@@ -2457,7 +2509,7 @@
         const safeMessageId = escapeHtml(message.id);
         const safeAuthor = escapeHtml(message.author);
         const safeContent = escapeHtml(message.content);
-        const displayTime = escapeHtml(formatDateTimeForUi(message.createdAt));
+        const displayTime = escapeHtml(formatChatTimeForUi(message.createdAt));
         const editedBadgeHtml = message.updatedAt
             ? '<span class="text-xs text-gray-500">(수정됨)</span>'
             : '';
@@ -2531,22 +2583,51 @@
                 </div>`;
     }
 
+    function renderChatDateDividerItem(dividerId, label) {
+        const safeDividerId = escapeHtml(dividerId);
+        const safeLabel = escapeHtml(label);
+
+        return `<div data-chat-item="true" data-message-id="${safeDividerId}" class="flex items-center gap-3 py-1">
+                    <div class="flex-1 border-t border-gray-800" aria-hidden="true"></div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap">${safeLabel}</span>
+                    <div class="flex-1 border-t border-gray-800" aria-hidden="true"></div>
+                </div>`;
+    }
+
     function buildChatMessageRenderDescriptors(messages) {
         if (!Array.isArray(messages)) return [];
 
-        return messages.map((message, index) => {
+        const itemDescriptors = [];
+        let previousDateKey = '';
+
+        messages.forEach((message, index) => {
             const itemId = normaliseEntityId(String(message?.id ?? ''));
             if (!itemId) {
                 throw new Error(`[App UI] Invalid chat message id at index ${index}.`);
             }
 
+            const parsedCreatedAt = parseIsoDateTime(message.createdAt);
+            const dateKey = getLocalDateKey(parsedCreatedAt) || `invalid-date-${index}`;
+            if (dateKey !== previousDateKey) {
+                const dividerId = `chat-date-divider__${dateKey}`;
+                const dividerHtml = renderChatDateDividerItem(dividerId, formatChatDateDividerLabel(message.createdAt));
+                itemDescriptors.push({
+                    id: dividerId,
+                    html: dividerHtml,
+                    signature: dividerHtml
+                });
+                previousDateKey = dateKey;
+            }
+
             const html = renderChatMessageItem(message);
-            return {
+            itemDescriptors.push({
                 id: itemId,
                 html,
                 signature: html
-            };
+            });
         });
+
+        return itemDescriptors;
     }
 
     function renderChatMessagesFull(containerEl, itemDescriptors) {
@@ -3049,7 +3130,7 @@
     }
 
     function formatBoardDate(isoDateTime) {
-        return formatDateTimeForUi(isoDateTime);
+        return formatBoardDateTimeForUi(isoDateTime);
     }
 
     function getBoardPostById(postId) {
